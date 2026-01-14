@@ -1,6 +1,6 @@
 # VaxCheck: Neuro-Symbolic Immunization Engine
 
-**Live Prototype:** xxxxxxx
+**Live Prototype:** https://vaxcheck-jonwu.vercel.app/
 
 ### Physician-Builder Context
 Built by **Dr. Jonathan Wu** to solve the "LLM Math Problem" in healthcare. Large Language Models struggle with date arithmetic and rigid interval logic. VaxCheck demonstrates a **Neuro-Symbolic Architecture**: it delegates "reasoning" to the LLM and "calculation" to a deterministic TypeScript engine.
