@@ -1,0 +1,7 @@
+{
+  "name": "VaxCheck",
+  "description": "Clinical Decision Support system for vaccination compliance. Features hard-logic gap analysis based on CDSi Logic Spec v4.6, optimistic UI updates, and privacy-preserving AI explanations.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
