@@ -1,32 +1,93 @@
 # VaxCheck: Neuro-Symbolic Immunization Engine
 
-**Live Prototype:** https://vaxcheck-jonwu.vercel.app/
+[![Live Prototype](https://img.shields.io/badge/🚀_Launch_Live_Prototype-Vercel-blue?style=for-the-badge&logo=vercel)](https://vaxcheck-jonwu.vercel.app/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-### Physician-Builder Context
-Built by **Dr. Jonathan Wu** to solve the "LLM Math Problem" in healthcare. Large Language Models struggle with date arithmetic and rigid interval logic. VaxCheck demonstrates a **Neuro-Symbolic Architecture**: it delegates "reasoning" to the LLM and "calculation" to a deterministic TypeScript engine.
+> **Physician-Builder Context:** Built by **Dr. Jonathan Wu** to solve the "LLM Math Problem" in healthcare. Large Language Models struggle with date arithmetic and rigid interval logic. VaxCheck demonstrates a **Neuro-Symbolic Architecture**: it delegates "reasoning" to the LLM and "calculation" to a deterministic TypeScript engine.
 
-### VaxCheck Purpose and Use Case
-VaxCheck is a Clinical Decision Support (CDS) application designed for healthcare providers, nurses, and public health officials to automate the complex evaluation of patient immunization records against CDC/ACIP guidelines. Its primary use case is to instantly determine a patient's vaccination status (e.g., Up-to-Date, Overdue, Due Now) for various vaccine series (like MMR, HepB, DTaP) without requiring manual calculation of intervals and ages. By handling the rigid, arithmetic-heavy logic of vaccination scheduling, it aims to reduce clinical errors, optimize catch-up schedules for patients who have fallen behind, and provide population-level insights for clinic administrators.
+---
 
-### Current Functionality
-The application features a comprehensive patient dashboard that visualizes vaccination history and future forecasts on an interactive timeline. 
-Users can view a detailed "flowsheet" that breaks down the status of every vaccine series, complete with specific reasons for that status (e.g., "Minimum interval not met"). 
-Key features include a "Smart Scan" tool that uses AI to parse images of physical vaccine cards, a printable catch-up calendar for patients, and a "Population Health Dashboard" that aggregates data to show compliance trends across the patient base. 
-It also includes a "System Settings" area where the underlying logic rules (JSON format) can be viewed, edited, or synced from a remote server, and a built-in "Unit Test" suite to verify the clinical logic engine against edge cases.
+## 1. Product Context (The "Why")
+*Target Audience: Product Managers, Public Health Directors*
 
-### Architecture
-* **Frontend:** React, TypeScript, Tailwind CSS.
-* **Logic Core:** Custom **Web Worker** architecture (`logic.worker.ts`) to process complex rule sets off the main thread.
-* **Interoperability:** Built-in **FHIR R4 Adapter** (`fhirAdapter.ts`) to demonstrate enterprise-grade data standardization.
-* **AI Layer:** Google Gemini (via `geminiService.ts`) handles the "Last Mile" explanation to the patient, translating raw logic outputs into empathetic, human-readable text.
+### 👤 User Persona
+Pediatricians, Public Health Nurses, and Clinic Administrators managing catch-up schedules.
 
-### Safety & Compliance
-* **No Hallucinations:** Vaccine due dates are calculated by **hard-coded logic**, not probabilistic token prediction.
-* **Privacy-First:** Logic processing happens client-side via Web Workers; no PHI is required to leave the browser for the rules engine to function.
-* **Standardized:** Adheres to CDC/ACIP-style interval logic (Minimum ages, catch-up schedules).
+### 🔴 The Problem
+**The "LLM Math" Gap:** General purpose AI models cannot reliably calculate date intervals (e.g., *"4 weeks minus 1 day"*). In vaccination, a single day's error invalidates a dose. Manual calculation against CDC/ACIP tables is slow, error-prone, and contributes to missed opportunities for vaccination (MOV).
 
-### Quick Start
-1. Clone repo
-2. `npm install`
-3. Create `.env` with `GEMINI_API_KEY`
-4. `npm run dev`
+### 🟢 The Solution
+VaxCheck is a **Hybrid Intelligence Engine**. It uses **Deterministic Logic** to calculate due dates with 100% mathematical precision, while using **Generative AI** only for the "Last Mile"—translating those complex logic outputs into empathetic, patient-friendly explanations.
+
+### ⚡ Key Metrics & Impact
+* **Zero Math Errors:** Hard-coded interval logic ensures strict adherence to minimum age/interval rules.
+* **Interoperability Ready:** Built-in **FHIR R4 Adapter** allows seamless data export to enterprise EHRs.
+* **Edge Performance:** Complex logic runs on **Web Workers**, ensuring 60fps UI performance even when processing population-level datasets.
+
+---
+
+## 2. Engineering Architecture (The "How")
+*Target Audience: Forward Deployed Engineers (Palantir), Solutions Architects*
+
+### 🏗️ Tech Stack
+* **Frontend:** React 19, TypeScript, Tailwind CSS
+* **Logic Core:** Custom **Web Worker** architecture (`logic.worker.ts`) for off-main-thread processing.
+* **AI Layer:** Google Gemini 1.5 Flash (Vision & Text)
+* **Data Standard:** HL7 FHIR R4 (Fast Healthcare Interoperability Resources)
+
+### 🔧 Key Engineering Decisions
+
+#### A. Neuro-Symbolic Architecture
+* **The Constraint:** LLMs are probabilistic token predictors, not calculators.
+* **The Architecture:**
+    * **The "Brain" (TypeScript):** A rigid JSON-based rules engine handles the math (e.g., `minAge: "6 months"`, `minInterval: "4 weeks"`).
+    * **The "Voice" (Gemini):** The LLM receives the *result* of the calculation and generates the *explanation* for the patient (e.g., *"Your child needs the MMR vaccine because they turned 1 year old yesterday..."*).
+
+#### B. Client-Side Performance (Web Workers)
+* **Challenge:** Evaluating 50+ rules against a full patient history can block the main thread, causing UI jank.
+* **Solution:** Implemented `logic.worker.ts` to offload recursive logic processing to a background thread. This architecture mimics production-grade heavy client apps (like Figma or Excel Web).
+
+#### C. Interoperability First (FHIR Adapter)
+* **Implementation:** Built a transformation layer that maps internal application state to **FHIR Immunization resources**.
+* **Why:** Proves readiness for enterprise integration with Epic, Cerner, or Palantir Foundry.
+
+---
+
+## 3. Current Functionality
+1.  **Smart Scan (Multimodal AI):** Uses Gemini Vision to parse images of physical vaccine cards into structured JSON data.
+2.  **Catch-Up Logic Engine:** Automatically identifies "Overdue" vs "Due Now" based on rigid ACIP-style logic.
+3.  **Population Health Dashboard:** Aggregates compliance data (e.g., "85% MMR coverage") for clinic-level insights.
+4.  **Unit Test Suite:** A visual testing interface to verify the logic engine against edge cases (e.g., leap years, premature birth).
+
+---
+
+## 4. Safety & Compliance
+* **Privacy by Design:** Logic processing happens entirely client-side. No PHI is sent to the server for the rules engine to function.
+* **Explanation Consistency:** By separating logic from generation, the AI cannot "hallucinate" a due date. It can only explain the date provided by the code.
+
+---
+
+## 5. Quick Start
+To run this project locally:
+
+1.  **Clone the repository**
+    ```bash
+    git clone [https://github.com/drjonwu/vaxcheck.git](https://github.com/drjonwu/vaxcheck.git)
+    cd vaxcheck
+    ```
+
+2.  **Install dependencies**
+    ```bash
+    npm install
+    ```
+
+3.  **Configure Environment**
+    Create a `.env` file in the root directory:
+    ```env
+    VITE_GEMINI_API_KEY=your_api_key_here
+    ```
+
+4.  **Run Development Server**
+    ```bash
+    npm run dev
+    ```
